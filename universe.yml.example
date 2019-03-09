@@ -1,0 +1,31 @@
+---
+environments:
+  - name: Development
+    key: dev
+    vpc_id: vpc-1234abcd
+    subnet_ids:
+    - subnet-5678abcd
+    - subnet-8765abcd
+  - name: Production
+    key: prod
+    vpc_id: vpc-5678efgh
+    subnet_ids:
+    - subnet-1234efgh
+    - subnet-4321efgh
+applications:
+  - name: Widget API
+    key: widget-api
+    ssh_key_prefix: widget-api
+    service_name: widgetapi
+    repository_url: https://github.com/example/widget-api
+    elb:
+      dev: widget-dev-elb
+      prod: widget-prod-elb
+    security_groups:
+      dev:
+        - sg-abcd0987
+      prod:
+        - sg-efgh1234
+    new_relic_app_id:
+      dev: '123456789'
+      prod: '987654321'

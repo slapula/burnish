@@ -1,0 +1,76 @@
+# Based on the "trust" template v0.1.2
+# https://github.com/japaric/trust/tree/v0.1.2
+
+dist: trusty
+language: rust
+services: docker
+sudo: required
+
+env:
+  global:
+    - CRATE_NAME=burnish
+    - DISABLE_TESTS=true
+
+matrix:
+  include:
+    # Linux
+    - env: TARGET=x86_64-unknown-linux-gnu NAME=linux-x86_64-gnu
+    - env: TARGET=x86_64-unknown-linux-musl NAME=linux-x86_64-musl
+    - env: TARGET=i686-unknown-linux-gnu NAME=linux-i686-gnu
+    - env: TARGET=i686-unknown-linux-musl NAME=linux-i686-musl
+    - env: TARGET=aarch64-unknown-linux-gnu NAME=linux-aarch64-gnu
+    - env: TARGET=arm-unknown-linux-gnueabi NAME=linux-arm-gnueabi
+
+    # OSX
+    - env: TARGET=i686-apple-darwin NAME=apple-i686-darwin
+      os: osx
+    - env: TARGET=x86_64-apple-darwin NAME=apple-x86_64-darwin
+      os: osx
+
+    # Testing other channels
+    - env: TARGET=x86_64-unknown-linux-gnu NAME=linux-x86_64-gnu
+      rust: nightly
+    - env: TARGET=x86_64-apple-darwin NAME=apple-x86_64-darwin
+      os: osx
+      rust: nightly
+
+before_install:
+  - set -e
+  - rustup self update
+
+install:
+  - sh ci/install.sh
+  - source ~/.cargo/env || true
+
+script:
+  - bash ci/script.sh
+
+after_script: set +e
+
+before_deploy:
+  - sh ci/before_deploy.sh
+
+deploy:
+  api_key:
+    secure: "GiTCJ+JAp82Ha/hZBATUrnzMFFTi9ejgR7CEFtYx+iFYQmnI7BQTiQu5txZ+V3CjjCs6E7hzA7TM0UEjfRqYryFFQrIgHZC79jxznvMzDvCCA/kks6fJzPAkLKi/PWTflCsHeAPhlW9oZ+LnLcLrB4CAXXb0F6XRibgttMbLnLO5g/w9Ebq9RSfd7GV96PLhPkygmCDs4VFJ2KcCQrhp4XjOaGdpiYQtsHHcvJWTBXaNPw9S5WbcENrJewTKeBmadc/OGiPFq/mfNi/IB+OG7mBx1og7+ye0p0rrUKUAoHzPJb/HShfKDNoTowwcrixMvI5CaYfGVMa/BtxCVP1naksasLwbr1cam5B/uHO/H/VQni9aYi9UkiRXLdti3BrYJmTJIrrZtp0V1wpfAEZ1Y6dUNIFxyQ8COsJk/uPMLxqkeqdrpoIZpHLBoFfZE4sUJ6A1qCrN8Bqol+PasTn1gq8RGUoF4mLWJCaTCEwbWCeTyT7/1Z7kK9KNOmeRIgK/fm0FAFSMK24dAUDfICoTNZzsJsn4vCfgAI5xywg0tV2MYHJRMQ6ancgmFQ9DlYy8g7Bi3brUhAlbVBJZwuSJNSISUGBpAHpIRLNGdrU0VCUVC14p2vfIB0abFgYihJX/ivBMEmywrxNEB/8q5asJc5B9bQSKtgcgQUy1GHCKe40="
+  file_glob: true
+  file: $CRATE_NAME-$TRAVIS_TAG-$NAME.*
+  on:
+    condition: $TRAVIS_RUST_VERSION = stable
+    tags: true
+  provider: releases
+  skip_cleanup: true
+
+cache: cargo
+before_cache:
+  - chmod -R a+r $HOME/.cargo
+
+branches:
+  only:
+    # release tags
+    - /^v\d+\.\d+\.\d+.*$/
+    - master
+
+notifications:
+  email:
+    on_success: never

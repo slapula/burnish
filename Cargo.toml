@@ -1,0 +1,28 @@
+[package]
+name = "burnish"
+version = "0.1.0"
+license = "MIT"
+authors = ["Aaron J. Smith <ajsmith10381@gmail.com>"]
+categories = ["aws", "command-line-interface"]
+description = "Safely deploy code to auto-scaling groups with this Rust-based command line utility"
+readme = "README.md"
+homepage = "https://github.com/slapula/burnish"
+repository = "https://github.com/slapula/burnish"
+travis-ci = { repository = "slapula/burnish", branch = "master" }
+keywords = ["aws", "ec2", "elb", "asg", "cli"]
+
+[dependencies]
+rusoto_core = "0.36.0"
+rusoto_ec2 = "0.36.0"
+rusoto_s3 = "0.36.0"
+rusoto_autoscaling = "0.36.0"
+rusoto_elb = "0.36.0"
+rusoto_cloudwatch = "0.36.0"
+clap = {version = "2.32", features = ["yaml"]}
+http = "0.1.14"
+futures = "0.1.25"
+yaml-rust = "0.4.2"
+chrono = "0.4.6"
+timeago = "0.1.5"
+prettytable-rs = "^0.8"
+log = "0.4"

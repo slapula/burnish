@@ -1,0 +1,416 @@
+name: burnish
+version: "0.1.0"
+author: Aaron J. Smith <ajsmith10381@gmail.com>
+about: "Safely deploy code to auto-scaling groups with this Rust-based command line utility"
+args:
+    - universe:
+        short: u
+        long: universe
+        value_name: FILE
+        help: YAML Universe file
+        takes_value: true
+    - region:
+        short: r
+        long: region
+        value_name: STRING
+        help: "AWS Region (Default: 'us-east-1')"
+        takes_value: true
+    - profile:
+        short: p
+        long: profile
+        value_name: STRING
+        help: "AWS Profile (Default: 'default')"
+        takes_value: true
+    - log-level:
+        short: l
+        long: log-level
+        value_name: STRING
+        help: "Logging Level: 'debug' for verbose, 'info' for terse (default: 'info')"
+        takes_value: true
+subcommands:
+    - debug:
+        about: debug application inventory json
+    - oneoff:
+        about: launch or terminate a one-off instance
+        subcommands:
+            - launch:
+                about: Launch a one-off instance using an existing AMI
+                args:
+                    - ami:
+                        help: AMI to use
+                        short: a
+                        long: ami
+                        value_name: STRING
+                        takes_value: true
+                    - name:
+                        help: Name to assign to the instance
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+                    - key:
+                        help: SSH key to use for remote access
+                        short: k
+                        long: key
+                        value_name: STRING
+                        takes_value: true
+                    - instance-type:
+                        help: Type of AWS EC2 instance to launch
+                        short: t
+                        long: instance-type
+                        value_name: STRING
+                        takes_value: true
+                    - iam-profile:
+                        help: Name of IAM profile to assign to the instance
+                        short: p
+                        long: iam-profile
+                        value_name: STRING
+                        takes_value: true
+                    - env:
+                        help: Application environment name
+                        short: e
+                        long: env
+                        value_name: STRING
+                        takes_value: true
+                    - security-groups:
+                        help: Security groups to assign to the instance
+                        short: sg
+                        long: security-groups
+                        value_name: LIST
+                        takes_value: true
+                    - foreground:
+                        help: Launch an instance and send sigint to terminal to terminate
+                        short: f
+                        long: foreground
+            - terminate:
+                about: Terminate a one-off instance using Instance ID
+                args:
+                    - instanceids:
+                        help: Instance Id(s) to terminate
+                        short: i
+                        long: instanceids
+                        value_name: STRING
+                        takes_value: true
+    - launchconfig:
+        about: create a new launch config
+        short: lc
+        long: launchconfig
+        args:
+            - app:
+                help: Application name
+                short: p
+                long: app
+                value_name: STRING
+                takes_value: true
+            - env:
+                help: Application environment name
+                short: e
+                long: env
+                value_name: STRING
+                takes_value: true
+            - version:
+                help: Application version
+                short: v
+                long: version
+                value_name: STRING
+                takes_value: true
+            - instance-type:
+                help: Type of AWS EC2 instance to launch
+                short: t
+                long: instance-type
+                value_name: STRING
+                takes_value: true
+            - iam-profile:
+                help: Name of IAM profile to assign to the instance
+                short: i
+                long: iam-profile
+                value_name: STRING
+                takes_value: true
+            - ami:
+                help: ID of the AMI to use
+                short: a
+                long: ami
+                value_name: STRING
+                takes_value: true
+            - user-data:
+                help: Path to user data script (May be an S3 URI or local file path)
+                short: u
+                long: user-data
+                value_name: STRING
+                takes_value: true
+    - autoscalegroup:
+        about: create & manipulate autoscale groups
+        short: asg
+        long: autoscalegroup
+        subcommands:
+            - rotate:
+                about: Perform a rolling replacement of all instances in an ASG
+                args:
+                    - name:
+                        help: Name of autoscale group to update
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+                    - batch:
+                        help: Number of instance to rotate at one time
+                        short: b
+                        long: batch
+                        value_name: INT
+                        takes_value: true
+            - updatelc:
+                about: Update launch config of an auto-scaling group
+                args:
+                    - name:
+                        help: Name of autoscale group to update
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+                    - launch-config:
+                        help: Name of the launch config
+                        short: l
+                        long: launch-config
+                        value_name: STRING
+                        takes_value: true
+            - create:
+                about: Create a new auto-scaling group
+                args:
+                    - app:
+                        help: Name of autoscale group to create
+                        short: a
+                        long: app
+                        value_name: STRING
+                        takes_value: true
+                    - role:
+                        help: Application role of autoscale group to create
+                        short: r
+                        long: role
+                        value_name: STRING
+                        takes_value: true
+                    - launch-config:
+                        help: Name of the launch config
+                        short: l
+                        long: launch-config
+                        value_name: STRING
+                        takes_value: true
+                    - env:
+                        help: Application environment name
+                        short: e
+                        long: env
+                        value_name: STRING
+                        takes_value: true
+                    - version:
+                        help: Application version
+                        short: v
+                        long: version
+                        value_name: STRING
+                        takes_value: true
+                    - canary:
+                        help: Launch a single canary instance into the new ASG
+                        short: c
+                        long: canary
+                        possible_values: ["true", "false"]
+                        default_value: "false"
+            - destroy:
+                about: Destroy an existing auto-scaling group
+                args:
+                    - name:
+                        help: Name of autoscale group to destroy
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+                    - force:
+                        help: Force deletion including any running instances
+                        short: f
+                        long: force
+                        possible_values: ["true", "false"]
+                        default_value: "false"
+            - resize:
+                about: Resize an existing auto-scaling group
+                args:
+                    - name:
+                        help: Name of autoscale group to update
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+                    - min:
+                        help: New min instance count for ASG
+                        short: m
+                        long: minimum
+                        value_name: INT
+                        takes_value: true
+                    - max:
+                        help: New max instance count for ASG
+                        short: x
+                        long: maximum
+                        value_name: INT
+                        takes_value: true
+                    - desired:
+                        help: New desired instance count for ASG
+                        short: d
+                        long: desired
+                        value_name: INT
+                        takes_value: true
+            - list:
+                about: List auto-scaling groups
+                args:
+                    - app:
+                        help: Specific application to list
+                        short: a
+                        long: app
+                        value_name: LIST
+                        takes_value: true
+                        multiple: true
+                    - env:
+                        help: Specific environment to list
+                        short: e
+                        long: env
+                        value_name: LIST
+                        takes_value: true
+                        multiple: true
+    - loadbalancer:
+        about: create & manipulate elastic load balancers
+        short: elb
+        long: loadbalancer
+        subcommands:
+            - stats:
+                about: Show stats about request volume and success
+                args:
+                    - name:
+                        help: Show specific application ELB stats
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+            - status:
+                about: Show information about an ELB
+                args:
+                    - name:
+                        help: Show specific application ELB
+                        short: n
+                        long: name
+                        value_name: STRING
+                        takes_value: true
+    - deployment:
+        about: perform deployment actions
+        short: deploy
+        long: deployment
+        subcommands:
+            - do:
+                about: perform a deployment
+                args:
+                    - version:
+                        help: Application version
+                        short: v
+                        long: version
+                        value_name: STRING
+                        takes_value: true
+                    - app:
+                        help: Name of application
+                        short: a
+                        long: app
+                        value_name: STRING
+                        takes_value: true
+                    - env:
+                        help: Application environment name
+                        short: e
+                        long: env
+                        value_name: STRING
+                        takes_value: true
+                    - force:
+                        help: Force burnish to bypass error and lantecy failsafes
+                        short: f
+                        long: force
+                    - max-latency:
+                        help: Value, in milliseconds, for maximum acceptable ELB request latency (If this rate is exceeded, the deployment will fail)
+                        short: l
+                        long: max-latency
+                        value_name: INT
+                        takes_value: true
+                    - max-error-rate:
+                        help: Value, as a percentage, of the maximum allowed ELB error rate (If this rate is exceeded, the deployment will fail)
+                        short: r
+                        long: max-error-rate
+                        value_name: INT
+                        takes_value: true
+                    - timeout:
+                        help: Value, in minutes, for maximum amount of time to wait for canary instance to become healthy
+                        short: t
+                        long: timeout
+                        value_name: INT
+                        takes_value: true
+                    - instance-type:
+                        help: The EC2 instance class to launch
+                        short: i
+                        long: instance-type
+                        value_name: STRING
+                        takes_value: true
+                    - iam-profile:
+                        help: The IAM profile to assign to EC2 instances
+                        short: p
+                        long: iam-profile
+                        value_name: STRING
+                        takes_value: true
+                    - user-data:
+                        help: Path to user data script (May be an S3 URI or local file path)
+                        short: u
+                        long: user-data
+                        value_name: STRING
+                        takes_value: true
+                    - strategy:
+                        help: Deployment strategy to use
+                        short: s
+                        long: strategy
+                        value_name: STRING
+                        takes_value: true
+                        possible_values: ["rolling", "replacement"]
+                        default_value: "rolling"
+                    - batch:
+                        help: Number of instances to replace at one time during rolling deployments
+                        short: b
+                        long: batch
+                        value_name: INT
+                        takes_value: true
+                        default_value: "1"
+            - mark:
+                about: Mark a deployment in New Relic
+                args:
+                    - version:
+                        help: Application version
+                        short: v
+                        long: version
+                        value_name: STRING
+                        takes_value: true
+                    - api-key:
+                        help: New Relic API key
+                        short: k
+                        long: api-key
+                        value_name: STRING
+                        takes_value: true
+                    - env:
+                        help: Application environment name
+                        short: e
+                        long: env
+                        value_name: STRING
+                        takes_value: true
+                    - description:
+                        help: Description of changes
+                        short: d
+                        long: description
+                        value_name: STRING
+                        takes_value: true
+                    - user:
+                        help: Name of user performing the deployment
+                        short: u
+                        long: user
+                        value_name: STRING
+                        takes_value: true
+                    - app:
+                        help: Name of application
+                        short: a
+                        long: app
+                        value_name: STRING
+                        takes_value: true
