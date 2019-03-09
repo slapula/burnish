@@ -70,7 +70,7 @@ pub fn elb_status(m: &clap::ArgMatches, r: rusoto_core::Region) {
     };
 
     let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
     table.set_titles(row!["Instance ID", "Health", "Name", "Version", "IP Address", "ASG", "Uptime"]);
 
     for (y, _z) in instance_data.iter().enumerate() {
@@ -167,7 +167,7 @@ pub fn elb_stats_cmd(r: rusoto_core::Region, m: &clap::ArgMatches) {
     };
 
     let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_BORDER_LINE_SEPARATOR);
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
     table.set_titles(row!["Interval", "Requests", "Requests/sec", "500 Errors", "500 Error %", "Connection Errors", "Avg. Latency (ms)"]);
 
     for stat in instance_stats {

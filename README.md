@@ -44,28 +44,28 @@ You can download a prebuilt binary [here](https://github.com/slapula/burnish/rel
 Use the `burnish elb stats` to fetch real-time ELB metrics from CloudWatch.
 
 ```
-$ deployer elb stats --app myapp --env prod
-ELB: myapp-prod-lb
-URL: https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers:search=myapp-prod-lb
-
-interval	request     count	rps	500 errors	500 rate %	connection errors	avg. latency (msec)
-1m0s		727		12.12	0		0.000%		0			38.047
-5m0s		4084		13.61	0		0.000%		0			36.285
-15m0s		12727		14.14	1		0.008%		0			36.504
-1h0m0s		53524		14.87	5		0.009%		0			37.201
+$ burnish elb stats --name my-example-elb
++----------+----------+--------------+------------+-------------+-------------------+-------------------+
+| Interval | Requests | Requests/sec | 500 Errors | 500 Error % | Connection Errors | Avg. Latency (ms) |
++----------+----------+--------------+------------+-------------+-------------------+-------------------+
+| 1 min    | 395      | 6.58         | 2          | 0.005       | 0                 | 0.190             |
+| 5 min    | 1820     | 6.07         | 14         | 0.008       | 0                 | 0.295             |
+| 15 min   | 5658     | 6.29         | 48         | 0.008       | 0                 | 0.310             |
+| 60 min   | 21650    | 6.01         | 202        | 0.009       | 0                 | 0.289             |
++----------+----------+--------------+------------+-------------+-------------------+-------------------+
 ```
 
 Use `burnish elb status` to retrieve information about instances registered with a load balancer. Omit `--app` to list all applications for an environment.
 
 ```
-$ deployer elb status --app myapp --env prod
-My App
-ELB Name: myapp-prod-lb
-ELB URL: https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LoadBalancers:search=myapp-prod-lb
+$ burnish elb status --name my-example-elb
++---------------------+-----------+---------------------+-------- +----------------+------------------+--------------------+
+| Instance ID         | Health    | Name                | Version | IP Address     | ASG              | Uptime             |
++---------------------+-----------+---------------------+---------+----------------+------------------+--------------------+
+| i-fa2825f154cb662a4 | InService | my-example-instance | r1337   | 10.247.117.28  | my-example-asg   | 3 days 3 hours ago |
+| i-19418f7dabcd27c52 | InService | my-example-instance | r1337   | 10.247.116.250 | my-example-asg   | 3 days 3 hours ago |
++---------------------+-----------+---------------------+---------+----------------+------------------+--------------------+
 
-ID			State		Name				Version		IP		ASG				Uptime
-i-078e537840be51a20	InService	myapp-prod		r150		10.245.109.44	myapp-prod-green	119h19m6.355255633s
-i-0b87d6e4c8a2cefdf	InService	myapp-prod		r150		10.245.109.101	myapp-prod-green	119h17m4.35530605s
 ```
 
 ### Application Deployment
