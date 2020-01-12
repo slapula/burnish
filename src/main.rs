@@ -76,7 +76,7 @@ fn main() {
             autoscalegroup::resize_asg_cmd(region.clone(), sub_m);
         };
         if let Some(sub_m) = matches.subcommand_matches("rotate") {
-            autoscalegroup::rotate_instances_cmd(region.clone(), sub_m, universe.clone());
+            autoscalegroup::rotate_instances_cmd(region.clone(), sub_m);
         };
         if let Some(sub_m) = matches.subcommand_matches("updatelc") {
             autoscalegroup::updatelc_asg_cmd(region.clone(), sub_m);

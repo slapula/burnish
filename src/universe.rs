@@ -1,6 +1,6 @@
 use yaml_rust::yaml;
 use http::Uri;
-use futures::{Stream, Future};
+use futures::{Future, Stream};
 use rusoto_s3::{S3, S3Client, GetObjectRequest};
 
 pub fn get_universe (u: std::string::String, r: rusoto_core::Region) -> yaml_rust::Yaml {
@@ -14,7 +14,7 @@ pub fn get_universe (u: std::string::String, r: rusoto_core::Region) -> yaml_rus
         };
         let result = s3_client.get_object(get_req).sync().expect("Couldn't GET universe file from S3");
         let stream = result.body.unwrap();
-        let body: Vec<u8> = stream.concat2().wait().unwrap();
+        let body: Vec<u8> = stream.concat2().wait().unwrap().to_vec();
         let universes = yaml::YamlLoader::load_from_str(&String::from_utf8_lossy(&body)).unwrap();
         let universe = universes[0].clone();
         return universe;

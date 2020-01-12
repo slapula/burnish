@@ -2,6 +2,10 @@
 
 `burnish` is a tool to manage deployments of EC2-powered applications.
 
+## IMPORTANT
+
+This project is a rewrite of Golang based tool that my employer uses in production (with their permission).  This is another attempt to help me learn how to write command line utilities in Rust.  While I believe I have complete feature coverage compared to the original tool, a lot of the work here has not been seriously tested.
+
 ## Overview
 
 `burnish` is a high-level wrapper of the AWS API. By using `burnish`, teams can quickly deploy new code releases, view the status of their environments, and modify the state of running applications.

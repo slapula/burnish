@@ -376,7 +376,7 @@ pub fn rotate_instances(r: rusoto_core::Region, n: String, b: usize) {
     };
 }
 
-pub fn rotate_instances_cmd(r: rusoto_core::Region, m: &clap::ArgMatches, u: yaml_rust::Yaml) {
+pub fn rotate_instances_cmd(r: rusoto_core::Region, m: &clap::ArgMatches) {
     rotate_instances(r, m.value_of("name").unwrap().to_string(), m.value_of("batch").unwrap().parse::<usize>().unwrap());
 }
 

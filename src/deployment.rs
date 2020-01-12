@@ -48,7 +48,6 @@ pub fn do_deployment_cmd(r: rusoto_core::Region, m: &clap::ArgMatches, u: yaml_r
     };
 
     let app = &u["applications"][m.value_of("app").unwrap()];
-    let env = &u["environments"][m.value_of("env").unwrap()];
     let lc = create_lc(r.clone(), m, u.clone());
     let elb = app["elb"][m.value_of("env").unwrap()].as_str().unwrap().to_string();
     let blue_asg = format!(
@@ -99,7 +98,7 @@ pub fn do_deployment_cmd(r: rusoto_core::Region, m: &clap::ArgMatches, u: yaml_r
 
         info!("canary instance is registered with the ELB and taking traffic. starting a 5 minute monitoring window.");
         for _s in 1..5 {
-            let mut canary_wait_stats = elb_stats(r.clone(), elb.clone(), 1);
+            let canary_wait_stats = elb_stats(r.clone(), elb.clone(), 1);
             info!("stats: {:?}", canary_wait_stats);
 
             thread::sleep(time::Duration::from_secs(60));
