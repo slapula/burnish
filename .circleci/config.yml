@@ -4,34 +4,34 @@ orbs:
 jobs:
   build:
     executor: rust/default
-    working_directory: ~/taggerspace
+    working_directory: ~/burnishspace
     steps:
       - checkout
       - attach_workspace:
-          at: ~/taggerspace
+          at: ~/burnishspace
       - rust/update_toolchain
       - rust/build:
           release: true
       - store_artifacts:
-          path: ~/taggerspace/target/release/tagger
+          path: ~/burnishspace/target/release/burnish
       - persist_to_workspace:
           root: .
           paths:
-            - target/release/tagger
+            - target/release/burnish
 
 
   publish-github-release:
     docker:
       - image: circleci/golang:1.12
-    working_directory: ~/taggerspace
+    working_directory: ~/burnishspace
     steps:
       - attach_workspace:
-          at: ~/taggerspace
+          at: ~/burnishspace
       - run:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ~/taggerspace/target/release/tagger
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${CIRCLE_TAG} ~/burnishspace/target/release/burnish
 
 workflows:
   main:
